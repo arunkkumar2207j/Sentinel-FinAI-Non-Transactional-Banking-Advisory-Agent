@@ -25,7 +25,7 @@ The project is divided into multiple phases, each representing a step in buildin
 
 ### Phase 2: Build a Basic Working Agent
 
-_(To be added)_
+→ [phase-2.md](./phase-2.md)
 
 ### Phase 3: Make the Agent Smarter
 
