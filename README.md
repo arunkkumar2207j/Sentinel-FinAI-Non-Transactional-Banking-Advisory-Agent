@@ -4,6 +4,7 @@ Detailed phase-wise documentation is available in the `/docs` folder.
 
 - 📁 [Documentation Overview](./docs/README.md)
 - 📄 [Phase 1: Problem Understanding](./docs/phase-1.md)
+- 📄 [Phase 2: Build a Basic Working Agent](./docs/phase-2.md)
 
 This project follows a structured **9-phase industry workflow**, covering:
 
