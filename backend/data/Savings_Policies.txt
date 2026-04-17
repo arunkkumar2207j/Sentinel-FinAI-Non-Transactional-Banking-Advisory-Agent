@@ -1,0 +1,17 @@
+SENTINEL FINAI - SAVINGS PRODUCT REPOSITORY
+Document ID: SF-2026-SAV
+Last Updated: April 2026
+
+1. Elite Savings Account:
+   - Annual Percentage Yield (APY): 4.25%
+   - Minimum Opening Deposit: $5,000
+   - Monthly Maintenance Fee: $15 (waived with $10,000 daily balance)
+
+2. Starter Savings Account:
+   - Annual Percentage Yield (APY): 1.50%
+   - Minimum Opening Deposit: $100
+   - No monthly maintenance fees.
+
+3. Student Savings Account:
+   - APY: 2.0%
+   - Only available for individuals aged 18-24 with valid proof of enrollment.

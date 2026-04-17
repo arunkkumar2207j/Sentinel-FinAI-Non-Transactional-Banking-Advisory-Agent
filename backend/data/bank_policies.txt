@@ -1,0 +1,6 @@
+SENTINEL FINAI - OFFICIAL BANKING POLICIES
+1. SAVINGS ACCOUNTS: The 'Elite Savings' account offers a 4.25% APY for balances above $10,000. The 'Starter Savings' offers 1.5% APY.
+2. MORTGAGE RATES: 15-year fixed-rate mortgages are currently 5.9%. 30-year fixed-rate mortgages are 6.45%.
+3. WITHDRAWAL LIMITS: Standard ATM withdrawals are limited to $1,000 per 24-hour period.
+4. LOAN ELIGIBILITY: Applicants require a minimum credit score of 680 and must provide 2 years of income tax returns.
+5. NON-TRANSACTIONAL LIMITS: AI Agents are strictly advisory. They cannot execute transfers, modify account details, or approve loan applications.
