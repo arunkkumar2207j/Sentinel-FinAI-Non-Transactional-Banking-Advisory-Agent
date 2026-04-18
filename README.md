@@ -8,6 +8,10 @@ Detailed phase-wise documentation is available in the `/docs` folder.
 - 📄 [Phase 3: Make the Agent Smarter](./docs/phase-3.md)
 - 📄 [Phase 4: Add Knowledge & Retrieval](./docs/phase-4.md)
 - 📄 [Phase 5: Enable Tool Usage](./docs/phase-5.md)
+- 📄 [Phase 6: Planning, Memory & Context](./docs/phase-6.md)
+- 📄 [Phase 7: Adaptive Behaviour](./docs/phase-7.md)
+- 📄 [Phase 8: Deployment Readiness](./docs/phase-8.md)
+- 📄 [Phase 9: Evaluation & Engineering Review](./docs/phase-9.md)
 
 This project follows a structured **9-phase industry workflow**, covering:
 
