@@ -188,6 +188,10 @@ class AdaptiveBankingAgent:
         if "start over" in query.lower():
             self.chat_history = []
             return "Session reset. How can I help you today?", 0
+
+        # This prevents the "I don't have that record" error for gibberish
+        if not query.strip() or len(query.strip()) < 3 or not any(c.isalpha() for c in query):
+            return "I'm sorry, I didn't quite catch that. Could you please rephrase your request?", 0.01
         
         # 2. RAG Retrieval
         docs = self.retriever.invoke(query)
@@ -208,14 +212,14 @@ class AdaptiveBankingAgent:
 
         # 4. Execute
         agent = create_openai_tools_agent(self.llm, self.tools, self.get_prompt())
-        executor = AgentExecutor(
+        self.executor = AgentExecutor(
             agent=agent, 
             tools=self.tools, 
             verbose=True,
             handle_parsing_errors=True
         )
         
-        response = executor.invoke({
+        response = self.executor.invoke({
             "input": rich_input,
             "chat_history": current_history
         })

@@ -11,6 +11,7 @@ Detailed phase-wise documentation is available in the `/docs` folder.
 - 📄 [Phase 6: Planning, Memory & Context](./docs/phase-6.md)
 - 📄 [Phase 7: Adaptive Behaviour](./docs/phase-7.md)
 - 📄 [Phase 8: Deployment Readiness](./docs/phase-8.md)
+- 📄 [Phase 8 - A: Architectural Design based on Phase 8](./docs/ARCHITECTURE.md)
 - 📄 [Phase 9: Evaluation & Engineering Review](./docs/phase-9.md)
 
 This project follows a structured **9-phase industry workflow**, covering:
