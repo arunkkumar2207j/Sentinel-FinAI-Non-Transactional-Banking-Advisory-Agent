@@ -1,0 +1,21 @@
+name: sentinel_finai_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - fastapi
+      - uvicorn
+      - websockets
+      - langchain
+      - langchain-openai
+      - langchain-chroma
+      - langchain-community
+      - streamlit
+      - python-dotenv
+      - pydantic
+      - docx2txt # Fixes the zipfile error source
+      - pypdf
+      - chromadb

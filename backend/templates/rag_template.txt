@@ -1,0 +1,8 @@
+Use the following bank documents to answer the question.
+
+CONTEXT:
+{context}
+
+USER QUESTION: {question}
+
+INSTRUCTION: If the context doesn't contain the answer, use your tools or say you don't have the info.
