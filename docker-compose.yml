@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  sentinel-finai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel-finai
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+    volumes:
+      - ./backend/data:/app/backend/data
+      - ./backend/logs:/app/backend/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Optional: Add a reverse proxy with nginx for production
+  # Uncomment the following section if using nginx
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: sentinel-nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - sentinel-finai
+  #   restart: unless-stopped
