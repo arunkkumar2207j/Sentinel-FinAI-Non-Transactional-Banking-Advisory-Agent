@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import time
 from dotenv import load_dotenv
@@ -22,9 +23,9 @@ from utils.logger_utils import rag_log, ops_log
 load_dotenv()
 
 class LoanInput(BaseModel):
-    principal: float = Field(..., description="Loan amount in dollars")
-    annual_rate: float = Field(..., description="Interest rate in percentage")
-    years: int = Field(..., description="Loan duration in years")
+    principal: float = Field(..., gt=0, description="Loan amount in dollars, must be greater than zero")
+    annual_rate: float = Field(..., ge=0, description="Interest rate in percentage, must be non-negative")
+    years: int = Field(..., gt=0, description="Loan duration in years, must be at least 1")
 
 class EligibilityInput(BaseModel):
     credit_score: int = Field(..., description="Credit score between 300 and 850")
@@ -43,9 +44,13 @@ def calculate_monthly_loan_payment(principal: float, annual_rate: float, years: 
         return "Error: Principal must be positive. We cannot calculate a negative loan."
     if annual_rate < 0 or years <= 0:
         return "REJECTED: Invalid interest rate or duration parameters."
-        
+
     monthly_rate = (annual_rate / 100) / 12
     num_payments = years * 12
+    if annual_rate == 0:
+        # 0% interest: equal principal-only payments, total cost = $0
+        payment = principal / num_payments
+        return f"At 0% interest, the monthly payment is ${payment:.2f} over {years} years. Total interest cost: $0.00."
     # Standard Amortization Formula: P [ i(1 + i)^n ] / [ (1 + i)^n – 1]
     payment = principal * (monthly_rate * (1 + monthly_rate)**num_payments) / ((1 + monthly_rate)**num_payments - 1)
     return f"The estimated monthly payment is ${payment:.2f} over {years} years at {annual_rate}%."
@@ -179,10 +184,52 @@ class AdaptiveBankingAgent:
             self.chat_history = []
             return "Session reset. How can I help you today?", 0
 
+        # Feedback detection: persist tone preference before any RAG/LLM work
+        if re.search(r'\b(be\s+)?(extremely\s+|very\s+|more\s+)?(brief|concise|short|terse|quick)\b', clean_query) or \
+                re.search(r'keep\s+(it\s+)?(short|brief|concise)', clean_query):
+            self._save_feedback("concise")
+            return "Understood — I'll keep my responses brief from now on.", 0.0
+        if re.search(r'\b(be\s+)?(more\s+)?(detailed|verbose|thorough|explanatory|conversational)\b', clean_query):
+            self._save_feedback("detailed")
+            return "Got it — I'll provide more detailed explanations going forward.", 0.0
+
+        # Provenance questions — answer directly without RAG to avoid irrelevant context injection
+        if re.search(
+            r'where\s+(did\s+you|do\s+you)\s+get|'
+            r'(what|where)\s+(is\s+)?(your\s+)?(source|data|info(rmation)?)\s*(from|come\s+from)?|'
+            r'how\s+do\s+you\s+know|'
+            r'where\s+(does\s+this|is\s+this)\s+(come\s+from|from)|'
+            r'who\s+told\s+you',
+            clean_query
+        ):
+            return (
+                "My responses are based on Sentinel Bank's official internal documents — "
+                "including product policies, savings rates, and loan guidelines — "
+                "retrieved from a secure knowledge base. "
+                "I do not use external websites or third-party sources.", 0.0
+            )
+
+        # Guardrail: $0 loan queries — catch before RAG to avoid chat-history contamination
+        if re.search(r'\$\s*0\b|zero[\s-]?dollar|no[\s-]?principal', clean_query) and \
+                re.search(r'loan|borrow|cost|payment|interest', clean_query):
+            return (
+                "A loan with $0 principal has no cost — there is nothing to borrow. "
+                "The total interest and monthly payment would both be $0. "
+                "Please provide a valid loan amount to get a calculation.", 0.0
+            )
+
+        # Guardrail: negative loan amount — catch before RAG to prevent LLM from stripping the sign
+        if re.search(r'-\s*\$[\d,]+|-\s*[\d,]+\s*dollar', clean_query) and \
+                re.search(r'loan|borrow|calculat|payment|mortgage', clean_query):
+            return (
+                "I'm sorry, a loan amount cannot be negative. "
+                "Please provide a positive dollar amount for your loan calculation.", 0.0
+            )
+
         # Resilience Guardrails
         greetings = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon"]
         if clean_query in greetings:
-            pass 
+            pass
         elif not clean_query or len(clean_query) < 3 or not any(c.isalpha() for c in clean_query):
             return "I'm sorry, I didn't quite catch that. Could you please rephrase your request?", 0.01
         

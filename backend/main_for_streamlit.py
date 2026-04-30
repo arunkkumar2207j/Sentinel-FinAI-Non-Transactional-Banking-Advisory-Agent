@@ -19,14 +19,22 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+@st.cache_resource
+def get_agent():
+    """Load ChromDB + LLM exactly once, shared across all sessions."""
+    return AdaptiveBankingAgent()
+
 class SentinelProductionAgent:
-    def __init__(self):
-        try:
-            self.agent = AdaptiveBankingAgent()
-            logger.info("Sentinel-FinAI Agent initialized successfully.")
-        except Exception as e:
-            logger.error(f"Initialization Failed: {str(e)}")
-            st.error("Critical System Failure: Could not load AI Model.")
+    def __init__(self, agent: AdaptiveBankingAgent):
+        self.agent = agent
+        logger.info("Sentinel-FinAI Agent initialized successfully.")
+        # try:
+        #     self.agent = AdaptiveBankingAgent()
+        #     logger.info("Sentinel-FinAI Agent initialized successfully.")
+        # except Exception as e:
+        #     logger.error(f"Initialization Failed: {str(e)}")
+        #     st.error("Critical System Failure: Could not load AI Model.")
 
     def process_request(self, query):
         start_time = time.time()
@@ -44,12 +52,9 @@ class SentinelProductionAgent:
         except Exception as e:
             logging.error(f"Error: {str(e)}")
             # Graceful failure handling (Phase 8 requirement)
+            latency = round(time.time() - start_time, 2)
             return "I'm sorry, I encountered a technical glitch while processing your request. Please try again."
 
-@st.cache_resource
-def get_agent():
-    # This ensures the VectorDB and LLM only load ONCE
-    return AdaptiveBankingAgent()
 
 def run_ui():
     st.set_page_config(page_title="Sentinel-FinAI", page_icon="🏦")
@@ -59,12 +64,12 @@ def run_ui():
     agent = get_agent()
 
     # Ensure the agent instance persists to keep chat_history alive
-    if "agent" not in st.session_state:
-        st.session_state.agent = AdaptiveBankingAgent()
+    # if "agent" not in st.session_state:
+    #     st.session_state.agent = AdaptiveBankingAgent()
 
     # Session State Management
     if "production_agent" not in st.session_state:
-        st.session_state.production_agent = SentinelProductionAgent()
+        st.session_state.production_agent = SentinelProductionAgent(agent)
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -72,7 +77,8 @@ def run_ui():
         st.header("System Observability")
         if st.button("Clear History"):
             st.session_state.messages = []
-            st.session_state.agent.chat_history = [] 
+            # st.session_state.agent.chat_history = [] 
+            agent.chat_history = []
             st.rerun()
         st.divider()
         st.info("Logs: `logs/sentinel_ops.log`")
